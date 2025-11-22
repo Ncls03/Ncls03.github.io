@@ -22,7 +22,7 @@
 						<nav class="links">
 							<ul>
 								<li><a href="index.html">LETTERS</a></li>
-								<li><a href="#">COMICS</a></li>
+								<li><a href="COMICS.html">COMICS</a></li>
 								<li><a href="#">PUZZLES</a></li>
 								<li><a href="#">VIDEOS</a></li>
 								<li><a href="#">PICTURES</a></li>
@@ -88,22 +88,65 @@
 							<article class="post">
 								<header>
 									<div class="title">
-										<h2>The first moment i</h2>
-										<p>felt at peace with you</p>
+										<h2>RANDOM COMIC PANELS</h2>
+										<p></p>
 									</div>
 									<div class="meta">
-										<time class="published" datetime="2015-11-01">November 27, 2024</time>
+																		</div>
+								</header>
+								<header>
+									<div class="title">
+										<h1>The Run Away Princess</h1>
+										<p></p>
+									</div>
+									<div class="meta">
+										<time class="published" datetime="2015-11-01">November 22, 2025</time>
 										<a class="author"><span class="name">plug</span><img src="assets/images/avatar.jpg" alt="" /></a>
 									</div>
 								</header>
-								<span class="image featured"><img src="assets/images/27.jpg" alt="" /></span>
-								<p>On the 27th day of November, we watched LPU’s Christmas tree lighting together. Do you remember? Although the so-called tree’s design was a bit distasteful and the lighting wasn’t that grand, I still enjoyed watching it because I was with you. We didn’t hold hands or kiss, but I felt the tingling one would feel when doing all those.</p>
-								<p>Minutes before they turned the lights on, I took my phone out to record the moment because I knew I wouldn’t be looking at the tree when it happened. While everyone gazed at the lights with awe, I stared at the girl beside me. That was the time I understood that my feelings weren’t just a simple high school crush anymore. For the first time, I found peace in a person, and you didn’t even do anything; you just stood there. Somehow, I felt a sense of peace just by looking at you. It was the kind of peace I only feel when I stare at city lights, but even better. </p>
-								<p>We had been talking for weeks before that day, and you have slowly introduced me to some parts of yourself. I never expected you to be that ‘corny’, but I loved it. I didn’t know the “Francheska Jayectin” had that in her. You had interesting quirks, like your obsession with blurting out the word “oten”. I thought you were the kind to give people looks when they say such words, and I love that I was wrong about it. I genuinely found you to be an interesting person. Someone that I was really eager to learn more about. How blessed I am to have been given the chance to get to know you more and, I wish, for the rest of my life.</p>
-								<div style="text-align: center;">
-								<video src="assets/videos/PEACE%20VIDEO.mp4" width="300" height="300" controls></video>
-								</div>
-								<p>Were you annoyed here? HAHA. I'm sorry beb.</p>
+<!-- Comic Panels START -->
+<style>
+.comic-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+  width: 600px;
+  margin: 40px auto;
+}
+.comic-panel img {
+  width: 100%;
+  height: auto;
+  border: 2px solid #333;
+  border-radius: 8px;
+  box-shadow: 2px 4px 16px rgba(0,0,0,0.15);
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.comic-panel img.active {
+  border-color: #ff595e;
+  box-shadow: 0 0 16px 4px #ff595e90;
+}
+</style>
+
+<div class="comic-panel">
+  <img src="assets/images/Comic%201/6.jpg" alt="Panel 1">
+  <img src="assets/images/Comic%201/7.jpg" alt="Panel 2">
+  <img src="assets/images/Comic%201/8.jpg" alt="Panel 3">
+  <img src="assets/images/Comic%201/9.jpg" alt="Panel 4">
+</div>
+<script>
+  // JavaScript: highlight a panel when clicked
+  const imgs = document.querySelectorAll('.comic-panel img');
+  imgs.forEach(img => {
+    img.addEventListener('click', () => {
+      imgs.forEach(i => i.classList.remove('active'));
+      img.classList.add('active');
+    });
+  });
+</script>
+<!-- Comic Panels END -->
 								<footer>
 									<ul class="stats">
 										<li><a href="#">written with love</a></li>
