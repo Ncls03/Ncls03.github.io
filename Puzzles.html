@@ -1,0 +1,376 @@
+<!DOCTYPE HTML>
+<!--
+	Future Imperfect by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>For My Baby</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+	</head>
+	<body class="single is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<h1><a href="index.html">05.19.2025</a></h1>
+						<nav class="links">
+							<ul>
+								<li><a href="index.html">LETTERS</a></li>
+								<li><a href="COMICS.html">COMICS</a></li>
+								<li><a href="#">PUZZLES</a></li>
+								<li><a href="#">VIDEOS</a></li>
+								<li><a href="#">PICTURES</a></li>
+							</ul>
+						</nav>
+						<nav class="main">
+							<ul>
+								<li
+									
+									<form id="search" method="get" action="#">
+										<input type="text" name="query" placeholder="Search" />
+									</form>
+								</li>
+								<li class="menu">
+									<a class="fa-bars" href="#menu">Menu</a>
+								</li>
+							</ul>
+						</nav>
+					</header>
+
+				<!-- Menu -->
+					<section id="menu">
+
+						<!-- Search -->
+							<section>
+								<form class="search" method="get" action="#">
+									<input type="text" name="query" placeholder="Search" />
+								</form>
+							</section>
+
+						<!-- Links -->
+							<section>
+								<ul class="links">
+									<li>
+										<a href="#">
+											<h3>food dates</h3>
+											<p>LET'S GET FAT TOGETHER</p>
+										</a>
+									</li>
+									<li>
+										<a href="#">
+											<h3>travel dates</h3>
+											<p>LET'S WITNESS THE WORLD TOGETHER</p>
+										</a>
+									</li>
+									
+								</ul>
+							</section>
+
+						<!-- Actions -->
+							<section>
+								<ul class="actions stacked">
+									<li><a href="index.html" class="button large fit">BACK</a></li>
+								</ul>
+							</section>
+
+					</section>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+							<article class="post">
+								<header>
+									<div class="title">
+										<h2>BUNCH'A PUZZLES 'INNIT?</h2>
+										<p></p>
+									</div>
+									
+									
+								</header>
+							<article class="post">
+								
+								<header>
+									<div class="title">
+										<h1>Word Scramble</h1>
+										<p></p>
+									</div>
+									<div class="meta">
+										<time class="published" datetime="2015-11-01">December 11, 2025</time>
+										<a class="author"><span class="name">plug</span><img src="assets/images/avatar.jpg" alt="" /></a>
+									</div>
+								</header>
+								<!-- Word Scramble Puzzle -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Word Scramble Puzzle</title>
+  <style>
+    body {
+      font-family: Lucida Console, monospace;
+      background: #f8f8ef;
+    }
+    #scramble-box {
+      margin: 70px auto;
+      max-width: 320px;
+      background: #f9cef7;
+      border-radius: 14px;
+      box-shadow: 0 0 8px #fedbff88;
+      padding: 30px;
+      text-align: center;
+    }
+    #scramble-word {
+      font-size: 1.8em;
+      font-weight: 600;
+      letter-spacing: 8px;
+      margin: 20px 0 24px;
+      color: #d5b6ef;
+    }
+    #scramble-answer {
+      font-size: 1.2em;
+      padding: 7px 12px;
+      border-radius: 6px;
+      border: 1.5px solid #c47ade;
+      outline: none;
+      text-align: center;
+      background: #fff;
+      margin-right: 8px;
+    }
+    #scramble-status {
+      font-size: 1em;
+      margin-top: 15px;
+      color: #189d25;
+      height: 22px;
+    }
+    #scramble-submit, #scramble-next {
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-size: 1em;
+      background: #a381c3;
+      border: none;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.96);
+      font-weight: 600;
+      margin-top: 12px;
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+    #scramble-submit:hover, #scramble-next:hover {
+      background: rgb(180, 221, 188);
+    }
+  </style>
+</head>
+<body>
+  <div id="scramble-box">
+    <div id="scramble-word"></div>
+    <input type="text" id="scramble-answer" maxlength="16" autocomplete="off">
+    <br>
+    <button id="scramble-submit">Guess</button>
+    <button id="scramble-next">Next</button>
+    <div id="scramble-status"></div>
+  </div>
+  <script>
+    const wordList = ['liminality','ineffable','ephemeral','resplendent','evanescence','catharsis','eudaimonia'];
+    let usedIndexes = [];
+    let answer = "";
+    function scramble(str) {
+      let arr = str.split('');
+      // Ensure scramble is different than the original
+      let scrambled;
+      do {
+        scrambled = arr.sort(()=>Math.random()-0.5).join('');
+      } while (scrambled === str && str.length > 1);
+      return scrambled;
+    }
+    function getNextWord() {
+      if (usedIndexes.length === wordList.length) {
+        usedIndexes = [];
+      }
+      let idx;
+      do {
+        idx = Math.floor(Math.random()*wordList.length);
+      } while (usedIndexes.includes(idx));
+      usedIndexes.push(idx);
+      return wordList[idx];
+    }
+    const wordElem = document.getElementById('scramble-word');
+    const input = document.getElementById('scramble-answer');
+    const submitBtn = document.getElementById('scramble-submit');
+    const nextBtn = document.getElementById('scramble-next');
+    const statusElem = document.getElementById('scramble-status');
+
+    function setNewWord() {
+      answer = getNextWord();
+      wordElem.textContent = scramble(answer);
+      input.value = "";
+      statusElem.textContent = "";
+      wordElem.style.color = "#b17017";
+      input.disabled = false;
+      submitBtn.disabled = false;
+      input.focus();
+    }
+
+    submitBtn.onclick = function() {
+      if (input.value.toLowerCase() === answer) {
+        statusElem.textContent = "Oi, you got it correctly!";
+        wordElem.textContent = answer.toUpperCase();
+        wordElem.style.color = "#189d25";
+        input.disabled = true;
+        submitBtn.disabled = true;
+      } else {
+        statusElem.textContent = "A bit schtewpid, aren't we?";
+      }
+    };
+    input.oninput = function() { statusElem.textContent = ""; };
+
+    nextBtn.onclick = setNewWord;
+
+    // Start game with first word
+    setNewWord();
+  </script>
+</body>
+</html>
+								</article>
+								
+
+
+									<article class="post">
+
+	<header>
+									<div class="title">
+										<h1>Memory Match</h1>
+										<p></p>
+									</div>
+									<div class="meta">
+										<time class="published" datetime="2015-11-01">December 11, 2025</time>
+										<a class="author"><span class="name">plug</span><img src="assets/images/avatar.jpg" alt="" /></a>
+									</div>
+								</header> 
+<!-- Memory Card Matching Game -->
+<style>
+#memory-board {
+  display: grid;
+  grid-template-columns: repeat(4, 54px);
+  gap: 10px;
+  margin: 40px auto;
+  justify-content: center;
+  padding: 20px;
+  background: #fdffea;
+  border-radius: 16px;
+  box-shadow: 0 0 12px #ffc38277;
+  max-width: 255px;
+}
+.memory-card {
+  width: 54px;
+  height: 54px;
+  font-size: 32px;
+  background: #f4d9ff;
+  border: 1.5px solid #d1b7ff;
+  border-radius: 8px;
+  cursor: pointer;
+  box-sizing: border-box;
+  text-align: center;
+  line-height: 54px;
+  transition: background 0.16s;
+  user-select: none;
+}
+.memory-card.matched {
+  background: #b6ffc9;
+  color: #233b17;
+  cursor: default;
+}
+.memory-card.flipped {
+  background: #ffec9a;
+}
+#memory-status {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 1em;
+  color: #6b2c8f;
+}
+</style>
+<div id="memory-board"></div>
+<div id="memory-status"></div>
+<script>
+const emojis=['🍕','🍔','🌮','🍟','🍿','🍦','🥨','🍩'];
+let pairSet = emojis.concat(emojis);
+for (let i = pairSet.length-1; i > 0; i--) {
+  let j = Math.floor(Math.random() * (i+1));
+  [pairSet[i], pairSet[j]] = [pairSet[j], pairSet[i]];
+}
+const board = document.getElementById('memory-board');
+const statusM = document.getElementById('memory-status');
+let flipped = [];
+let canFlip=true;
+for (let i=0; i<pairSet.length; i++) {
+  let card = document.createElement('div');
+  card.className = 'memory-card';
+  card.dataset.value = pairSet[i];
+  card.dataset.index = i;
+  card.innerHTML = '';
+  card.onclick = function(){
+    if (!canFlip || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+    card.classList.add('flipped');
+    card.innerHTML = card.dataset.value;
+    flipped.push(card);
+    if (flipped.length === 2) {
+      canFlip=false;
+      setTimeout(()=>{
+        if (flipped[0].dataset.value===flipped[1].dataset.value) {
+          flipped[0].classList.add('matched');
+          flipped[1].classList.add('matched');
+        } else {
+          flipped[0].classList.remove('flipped');
+          flipped[1].classList.remove('flipped');
+          flipped[0].innerHTML = '';
+          flipped[1].innerHTML = '';
+        }
+        flipped=[];
+        canFlip=true;
+        // Check win
+        if ([...board.children].every(c=>c.classList.contains('matched')))
+          statusM.textContent = "Not that tough wa'nit?";
+        else statusM.textContent = "";
+      }, 820);
+    }
+  };
+  board.appendChild(card);
+}
+</script>
+
+
+							
+							</article>
+
+					</div>
+
+				<!-- Footer -->
+					<section id="footer">
+						<ul class="icons">
+							<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+							<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+							<li><a href="#" class="icon solid fa-rss"><span class="label">RSS</span></a></li>
+							<li><a href="#" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+						</ul>
+						
+					</section>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
