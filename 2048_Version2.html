@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>2048 — Single File</title>
+  <style>
+    :root{
+      --bg:#faf8ef; --board:#97ac92; --cell:#4a654e;
+      --tile-2:#c14e87; --tile-4:#f0afff; --tile-8:#e344ff; --tile-16:#b96be2;
+      --tile-32:#a879e7; --tile-64:#8948bf; --tile-128:#c664ea; --tile-256:#c14a8e;
+      --tile-512:#993ca0; --tile-1024:#ed3fc4; --tile-2048:#ed2e8d;
+      --text-dark:#fef4ff; --text-light:#f9f6f2;
+    }
+    *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;}
+    html,body{height:100%;}
+    body{margin:0;background:linear-gradient(180deg,#faf8ef,#f6f2e9);display:flex;align-items:center;justify-content:center;padding:20px;}
+    .wrap{width:420px;background:var(--bg);padding:18px;border-radius:8px;box-shadow:0 8px 30px rgba(212, 105, 231, 0.12);}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+    h1{font-size:20px;margin:0;color:#d176ce;}
+    .meta{display:flex;gap:10px;align-items:center;}
+    .score{background:#b264bc;color:var(--text-light);padding:6px 10px;border-radius:6px;font-weight:800;}
+    .controlsSmall{display:flex;gap:8px;align-items:center;}
+    button{background:#e3aced;color:var(--text-light);border:none;padding:8px 12px;border-radius:6px;cursor:pointer;font-weight:700;}
+    .boardWrap{position:relative;margin:auto;}
+    .board{width:386px;height:386px;background:var(--board);border-radius:8px;padding:12px;display:grid;grid-template-columns:repeat(4,1fr);grid-gap:12px;position:relative;overflow:hidden;}
+    .cell{background:var(--cell);border-radius:6px;height:100%;display:flex;align-items:center;justify-content:center;font-weight:800;color:rgba(220, 122, 249, 0.15);font-size:24px;}
+    .tiles{position:absolute;left:12px;top:12px;pointer-events:none;}
+    .tile{position:absolute;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;transition:left .14s ease, top .14s ease, transform .12s ease;box-shadow:0 6px 18px rgba(0,0,0,.12);will-change:left,top,transform;}
+    .tile .val{display:block;user-select:none;padding:6px;}
+    .tile.new{animation:pop .14s ease;}
+    @keyframes pop{0%{transform:scale(.1)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+
+    /* tile colors & sizes */
+    .t-2{background:var(--tile-2);color:var(--text-dark);font-size:24px;}
+    .t-4{background:var(--tile-4);color:var(--text-dark);font-size:24px;}
+    .t-8{background:var(--tile-8);color:var(--text-light);font-size:24px;}
+    .t-16{background:var(--tile-16);color:var(--text-light);font-size:22px;}
+    .t-32{background:var(--tile-32);color:var(--text-light);font-size:22px;}
+    .t-64{background:var(--tile-64);color:var(--text-light);font-size:20px;}
+    .t-128{background:var(--tile-128);color:var(--text-light);font-size:18px;}
+    .t-256{background:var(--tile-256);color:var(--text-light);font-size:18px;}
+    .t-512{background:var(--tile-512);color:var(--text-light);font-size:16px;}
+    .t-1024{background:var(--tile-1024);color:var(--text-light);font-size:14px;}
+    .t-2048{background:var(--tile-2048);color:var(--text-light);font-size:14px;}
+
+    .overlay{position:absolute;inset:12px;background:rgb(126, 108, 208);display:flex;align-items:center;justify-content:center;flex-direction:column;border-radius:8px;z-index:50;backdrop-filter: blur(2px);}
+    .overlay h2{margin:0;color:#c68dd0;}
+    .hint{margin-top:8px;color:rgba(220, 140, 255, 0.99);font-size:13px;text-align:center;max-width:80%;}
+    .footer{margin-top:12px;color:#000000;font-size:13px;text-align:center;}
+    @media (max-width:460px){.wrap{width:100%}}
+  </style>
+</head>
+<body>
+  <div class="wrap" id="app">
+    <header>
+      <h1>2048</h1>
+      <div class="meta">
+        <div class="score" id="score">0</div>
+        <div class="score" id="best">0</div>
+        <div class="controlsSmall">
+          <button id="newBtn" title="Start a new game">New</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="boardWrap">
+      <div class="board" id="board" tabindex="0" aria-label="2048 board">
+        <!-- background cells will be generated -->
+      </div>
+      <div class="tiles" id="tiles"></div>
+    </div>
+
+    <div class="footer">Use arrow keys / WASD or swipe. Reach 2048 to win. Best stored locally.</div>
+    <button><a href="Puzzles.html" class="button">BACK</a></button>
+
+  </div>
+  
+
+<script>
+/* Working 2048 single-file implementation
+   - Renders initial tiles
+   - Arrow/WASD keys and touch swipe
+   - Score + best in localStorage
+   - Simple pop animation for new tiles
+*/
+
+const SIZE = 4;
+const GAP = 12;
+const BOARD_PADDING = 12; // corresponds to CSS padding of .board
+let board = createEmptyBoard();
+let score = 0;
+let best = Number(localStorage.getItem('best2048') || 0);
+
+const boardEl = document.getElementById('board');
+const tilesEl = document.getElementById('tiles');
+const scoreEl = document.getElementById('score');
+const bestEl = document.getElementById('best');
+const newBtn = document.getElementById('newBtn');
+
+let cellSize = 0;
+
+// build background cells
+function buildBackgroundCells(){
+  boardEl.innerHTML = '';
+  for (let i=0;i<SIZE*SIZE;i++){
+    const c = document.createElement('div');
+    c.className = 'cell';
+    boardEl.appendChild(c);
+  }
+}
+buildBackgroundCells();
+
+function computeCellSize(){
+  const rect = boardEl.getBoundingClientRect();
+  // inner area inside padding
+  const inner = rect.width - BOARD_PADDING*2;
+  cellSize = (inner - (SIZE-1)*GAP) / SIZE;
+  tilesEl.style.width = inner + 'px';
+  tilesEl.style.height = inner + 'px';
+}
+window.addEventListener('resize', ()=>{ computeCellSize(); renderTiles(); });
+computeCellSize();
+
+function createEmptyBoard(){
+  const b = [];
+  for (let r=0;r<SIZE;r++){
+    b.push(new Array(SIZE).fill(0));
+  }
+  return b;
+}
+
+function addRandomTile(){
+  const empties = [];
+  for (let r=0;r<SIZE;r++) for (let c=0;c<SIZE;c++) if (board[r][c] === 0) empties.push([r,c]);
+  if (!empties.length) return false;
+  const [r,c] = empties[Math.floor(Math.random()*empties.length)];
+  board[r][c] = Math.random() < 0.9 ? 2 : 4;
+  return true;
+}
+
+function startGame(){
+  board = createEmptyBoard();
+  score = 0;
+  addRandomTile();
+  addRandomTile();
+  updateScoreDisplays();
+  computeCellSize();
+  renderTiles(true);
+  hideOverlay();
+}
+newBtn.addEventListener('click', startGame);
+
+// helpers for moves
+function slideArray(row){
+  // compress non-zeros left, merge once, return new row and gained score
+  const arr = row.filter(v=>v!==0);
+  const out = [];
+  let gained = 0;
+  for (let i=0;i<arr.length;i++){
+    if (i+1 < arr.length && arr[i] === arr[i+1]){
+      const v = arr[i]*2;
+      out.push(v);
+      gained += v;
+      i++; // skip next
+    } else {
+      out.push(arr[i]);
+    }
+  }
+  while (out.length < SIZE) out.push(0);
+  return [out, gained];
+}
+
+function moveLeft(){
+  let moved = false, gained = 0;
+  const newBoard = createEmptyBoard();
+  for (let r=0;r<SIZE;r++){
+    const [row, g] = slideArray(board[r]);
+    for (let c=0;c<SIZE;c++) newBoard[r][c] = row[c];
+    if (row.some((v,i)=>v !== board[r][i])) moved = true;
+    gained += g;
+  }
+  if (moved){
+    board = newBoard;
+  }
+  return [moved,gained];
+}
+function moveRight(){
+  // reverse rows -> moveLeft -> reverse
+  rotateRowsReverse();
+  const [moved,gained] = moveLeft();
+  rotateRowsReverse();
+  return [moved,gained];
+}
+function moveUp(){
+  board = transpose(board);
+  const [moved,gained] = moveLeft();
+  board = transpose(board);
+  return [moved,gained];
+}
+function moveDown(){
+  board = transpose(board);
+  rotateRowsReverse();
+  const [moved,gained] = moveLeft();
+  rotateRowsReverse();
+  board = transpose(board);
+  return [moved,gained];
+}
+
+function rotateRowsReverse(){
+  for (let r=0;r<SIZE;r++) board[r].reverse();
+}
+function transpose(m){
+  const t = createEmptyBoard();
+  for (let r=0;r<SIZE;r++) for (let c=0;c<SIZE;c++) t[c][r] = m[r][c];
+  return t;
+}
+
+function canMove(){
+  for (let r=0;r<SIZE;r++) for (let c=0;c<SIZE;c++){
+    if (board[r][c] === 0) return true;
+    if (c+1 < SIZE && board[r][c] === board[r][c+1]) return true;
+    if (r+1 < SIZE && board[r][c] === board[r+1][c]) return true;
+  }
+  return false;
+}
+
+function checkWin(){
+  for (let r=0;r<SIZE;r++) for (let c=0;c<SIZE;c++) if (board[r][c] === 2048) return true;
+  return false;
+}
+
+function updateScoreDisplays(){
+  scoreEl.textContent = score;
+  bestEl.textContent = best;
+}
+
+let isHandling = false;
+async function handleMove(direction){
+  if (isHandling) return;
+  isHandling = true;
+  let moved=false, gained=0;
+  if (direction === 'left') [moved,gained] = moveLeft();
+  else if (direction === 'right') [moved,gained] = moveRight();
+  else if (direction === 'up') [moved,gained] = moveUp();
+  else if (direction === 'down') [moved,gained] = moveDown();
+
+  if (!moved){
+    isHandling = false;
+    return;
+  }
+  score += gained;
+  updateScoreDisplays();
+  // add one random tile then render
+  addRandomTile();
+  renderTiles();
+  await sleep(140); // allow pop animation
+  if (score > best){ best = score; localStorage.setItem('best2048', String(best)); updateScoreDisplays(); }
+  if (checkWin()){
+    showOverlay('You win!', 'You reached 2048. You can continue playing or press New.');
+  } else if (!canMove()){
+    showOverlay('Game over', `No more moves — score: ${score}`);
+  }
+  isHandling = false;
+}
+
+// Render tiles (clear and re-create). New tiles get .new class (pop animation).
+// We'll detect new tiles by comparing with previous snapshot.
+let prevSnapshot = createEmptyBoard();
+function renderTiles(force=false){
+  computeCellSize();
+  tilesEl.innerHTML = '';
+  // detect new positions: board[r][c] !== 0 && prevSnapshot[r][c] === 0
+  const newPositions = new Set();
+  for (let r=0;r<SIZE;r++) for (let c=0;c<SIZE;c++) if (board[r][c] !== 0 && prevSnapshot[r][c] === 0) newPositions.add(`${r},${c}`);
+
+  for (let r=0;r<SIZE;r++){
+    for (let c=0;c<SIZE;c++){
+      const val = board[r][c];
+      if (val === 0) continue;
+      const tile = document.createElement('div');
+      tile.className = 'tile t-' + sanitizeClass(val);
+      const left = (cellSize + GAP) * c;
+      const top = (cellSize + GAP) * r;
+      tile.style.width = cellSize + 'px';
+      tile.style.height = cellSize + 'px';
+      tile.style.left = left + 'px';
+      tile.style.top = top + 'px';
+      const span = document.createElement('div');
+      span.className = 'val';
+      span.textContent = val;
+      tile.appendChild(span);
+      if (newPositions.has(`${r},${c}`) && !force) tile.classList.add('new');
+      tilesEl.appendChild(tile);
+    }
+  }
+  // snapshot
+  prevSnapshot = board.map(row=>row.slice());
+}
+
+// sanitize tile class (cap at 2048)
+function sanitizeClass(v){
+  const n = Number(v);
+  if (n >= 2048) return '2048';
+  return String(n);
+}
+
+function sleep(ms){ return new Promise(resolve=>setTimeout(resolve, ms)); }
+
+// keyboard
+window.addEventListener('keydown', (ev)=>{
+  const k = ev.key;
+  let dir = null;
+  if (k === 'ArrowLeft' || k === 'a' || k === 'A') dir = 'left';
+  else if (k === 'ArrowRight' || k === 'd' || k === 'D') dir = 'right';
+  else if (k === 'ArrowUp' || k === 'w' || k === 'W') dir = 'up';
+  else if (k === 'ArrowDown' || k === 's' || k === 'S') dir = 'down';
+  if (dir){
+    ev.preventDefault();
+    handleMove(dir);
+  }
+});
+
+// touch swipe
+let startX = 0, startY = 0;
+const SWIPE_THRESHOLD = 24;
+boardEl.addEventListener('touchstart', (ev)=>{
+  if (ev.touches.length !== 1) return;
+  const t = ev.touches[0];
+  startX = t.clientX; startY = t.clientY;
+}, {passive:true});
+boardEl.addEventListener('touchend', (ev)=>{
+  if (!ev.changedTouches || ev.changedTouches.length !== 1) return;
+  const t = ev.changedTouches[0];
+  const dx = t.clientX - startX, dy = t.clientY - startY;
+  if (Math.abs(dx) < SWIPE_THRESHOLD && Math.abs(dy) < SWIPE_THRESHOLD) return;
+  if (Math.abs(dx) > Math.abs(dy)){
+    if (dx > 0) handleMove('right'); else handleMove('left');
+  } else {
+    if (dy > 0) handleMove('down'); else handleMove('up');
+  }
+}, {passive:true});
+
+// overlay
+let overlayEl = null;
+function showOverlay(title, subtitle=''){
+  if (overlayEl) return;
+  overlayEl = document.createElement('div');
+  overlayEl.className = 'overlay';
+  const h = document.createElement('h2'); h.textContent = title; overlayEl.appendChild(h);
+  if (subtitle){
+    const p = document.createElement('div'); p.className = 'hint'; p.textContent = subtitle; overlayEl.appendChild(p);
+  }
+  const btn = document.createElement('button'); btn.textContent = 'Continue'; btn.style.marginTop = '12px';
+  btn.addEventListener('click', ()=>{ hideOverlay(); });
+  overlayEl.appendChild(btn);
+  boardEl.appendChild(overlayEl);
+}
+function hideOverlay(){ if (!overlayEl) return; overlayEl.remove(); overlayEl = null; }
+
+// initialize
+function init(){
+  computeCellSize();
+  prevSnapshot = createEmptyBoard();
+  startGame();
+  prevSnapshot = board.map(r=>r.slice());
+  renderTiles(true);
+  updateScoreDisplays();
+}
+init();
+
+</script>
+</body>
+</html>
